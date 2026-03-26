@@ -50,7 +50,7 @@ def calc_retrieval_metrics_rr(
         cmc_top_k: Values of ``k`` to calculate ``cmc@k`` (`Cumulative Matching Characteristic`)
         precision_top_k: Values of ``k`` to calculate ``precision@k``
         map_top_k: Values of ``k`` to calculate ``map@k`` (`Mean Average Precision`)
-            ndcg_top_k: Values of ``k`` to calculate ``ndcg@k`` (`Normalized Discounted Cumulative Gain`) (`Mean Average Precision`)
+        ndcg_top_k: Values of ``k`` to calculate ``ndcg@k`` (`Normalized Discounted Cumulative Gain`) (`Mean Average Precision`)
         reduce: If ``False`` return metrics for each query without averaging
         verbose: Set ``True`` to make the function verbose.
 
