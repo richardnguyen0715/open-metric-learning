@@ -21,6 +21,7 @@ def calc_retrieval_metrics(
     cmc_top_k: Tuple[int, ...] = (5,),
     precision_top_k: Tuple[int, ...] = (5,),
     map_top_k: Tuple[int, ...] = (5,),
+    ndcg_top_k: Tuple[int, ...] = (5,),
     reduce: bool = True,
     verbose: bool = True,
 ) -> TMetricsDict:
@@ -63,6 +64,10 @@ def calc_retrieval_metrics(
     if map_top_k:
         map_ = calc_map(gt_tops, n_gts, map_top_k, verbose=verbose)
         metrics["map"] = dict(zip(map_top_k, map_))
+
+    if ndcg_top_k:
+        ndcg = calc_ndcg(gt_tops, n_gts, ndcg_top_k, verbose=verbose)
+        metrics["ndcg"] = dict(zip(ndcg_top_k, ndcg))
 
     if query_categories is not None:
         metrics_cat = {c: take_unreduced_metrics_by_mask(metrics, query_categories == c) for c in query_categories}
@@ -372,6 +377,46 @@ def calc_map(
     return map_
 
 
+def calc_ndcg(
+    gt_tops: Sequence[BoolTensor], n_gts: List[int], top_k: Tuple[int, ...], verbose: bool = False
+) -> List[FloatTensor]:
+    """
+    Function to compute Normalized Discounted Cumulative Gain (NDCG) at cutoffs ``top_k``.
+    """
+    check_if_nonempty_positive_integers(top_k, "top_k")
+
+    def ndcg_single(is_correct: BoolTensor, n_gt: int, k_: int) -> float:
+        if n_gt == 0 and len(is_correct) == 0:
+            return 1.0
+        elif n_gt > 0 and len(is_correct) == 0:
+            return 0.0
+        else:
+            k_ = min(k_, len(is_correct))
+            
+            # DCG
+            positions = torch.arange(1, k_ + 1).to(is_correct.device).float()
+            discounts = torch.log2(positions + 1)
+            dcg = torch.sum(is_correct[:k_].float() / discounts)
+            
+            # IDCG
+            ideal_k = min(k_, n_gt)
+            ideal_positions = torch.arange(1, ideal_k + 1).to(is_correct.device).float()
+            ideal_discounts = torch.log2(ideal_positions + 1)
+            idcg = torch.sum(1.0 / ideal_discounts)
+            
+            if idcg == 0:
+                return 0.0
+            
+            return float(dcg / idcg)
+
+    ndcg = []
+    for k in top_k:
+        items = tqdm(zip(gt_tops, n_gts), total=len(gt_tops), desc=f"NDCG@{k}") if verbose else zip(gt_tops, n_gts)
+        ndcg.append(FloatTensor([ndcg_single(is_correct, n_gt, k) for is_correct, n_gt in items]))
+
+    return ndcg
+
+
 def calc_fnmr_at_fmr(pos_dist: np.ndarray, neg_dist: np.ndarray, fmr_vals: Tuple[float, ...] = (0.1,)) -> FloatTensor:
     """
     Function to compute False Non Match Rate (FNMR) value when False Match Rate (FMR) value
@@ -544,4 +589,5 @@ __all__ = [
     "reduce_metrics",
     "take_unreduced_metrics_by_mask",
     "calc_fnmr_at_fmr",
+    "calc_ndcg",
 ]
