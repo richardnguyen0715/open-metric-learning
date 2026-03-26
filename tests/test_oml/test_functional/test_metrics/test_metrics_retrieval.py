@@ -13,6 +13,7 @@ def test_categories_in_metrics() -> None:
         "cmc_top_k": (1,),
         "precision_top_k": (3, 5),
         "map_top_k": tuple(),
+        "ndcg_top_k": tuple(),
     }
 
     # TEST WITHOUT CATEGORIES
@@ -35,7 +36,7 @@ def test_empty_predictions() -> None:
     gt_ids = [LongTensor([0]), LongTensor([]), LongTensor([10, 20])]
 
     metrics = calc_retrieval_metrics(
-        retrieved_ids=retrieved_ids, gt_ids=gt_ids, cmc_top_k=(3,), precision_top_k=(2,), map_top_k=(1,), reduce=False
+        retrieved_ids=retrieved_ids, gt_ids=gt_ids, cmc_top_k=(3,), precision_top_k=(2,), map_top_k=(1,), ndcg_top_k=tuple(), reduce=False
     )
 
     metrics_expected = {

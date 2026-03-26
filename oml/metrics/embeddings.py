@@ -37,6 +37,7 @@ def calc_retrieval_metrics_rr(
     cmc_top_k: Tuple[int, ...] = (5,),
     precision_top_k: Tuple[int, ...] = (5,),
     map_top_k: Tuple[int, ...] = (5,),
+    ndcg_top_k: Tuple[int, ...] = (5,),
     reduce: bool = True,
     verbose: bool = True,
 ) -> TMetricsDict:
@@ -49,6 +50,7 @@ def calc_retrieval_metrics_rr(
         cmc_top_k: Values of ``k`` to calculate ``cmc@k`` (`Cumulative Matching Characteristic`)
         precision_top_k: Values of ``k`` to calculate ``precision@k``
         map_top_k: Values of ``k`` to calculate ``map@k`` (`Mean Average Precision`)
+            ndcg_top_k: Values of ``k`` to calculate ``ndcg@k`` (`Normalized Discounted Cumulative Gain`) (`Mean Average Precision`)
         reduce: If ``False`` return metrics for each query without averaging
         verbose: Set ``True`` to make the function verbose.
 
@@ -62,6 +64,7 @@ def calc_retrieval_metrics_rr(
         cmc_top_k=cmc_top_k,
         precision_top_k=precision_top_k,
         map_top_k=map_top_k,
+        ndcg_top_k=ndcg_top_k,
         query_categories=query_categories,
         reduce=reduce,
         verbose=verbose,
@@ -115,6 +118,7 @@ class EmbeddingMetrics(IMetricVisualisable):
         cmc_top_k: Tuple[int, ...] = (5,),
         precision_top_k: Tuple[int, ...] = (5,),
         map_top_k: Tuple[int, ...] = (5,),
+        ndcg_top_k: Tuple[int, ...] = (5,),
         fmr_vals: Tuple[float, ...] = tuple(),
         pcf_variance: Tuple[float, ...] = (0.5,),
         postprocessor: Optional[IRetrievalPostprocessor] = None,
@@ -130,6 +134,7 @@ class EmbeddingMetrics(IMetricVisualisable):
             cmc_top_k: Values of ``k`` to calculate ``cmc@k`` (`Cumulative Matching Characteristic`)
             precision_top_k: Values of ``k`` to calculate ``precision@k``
             map_top_k: Values of ``k`` to calculate ``map@k`` (`Mean Average Precision`)
+            ndcg_top_k: Values of ``k`` to calculate ``ndcg@k`` (`Normalized Discounted Cumulative Gain`) (`Mean Average Precision`)
             fmr_vals: Values of ``fmr`` (measured in quantiles) to calculate ``fnmr@fmr`` (`False Non Match Rate
                       at the given False Match Rate`).
                       For example, if ``fmr_values`` is (0.2, 0.4) we will calculate ``fnmr@fmr=0.2``
@@ -151,6 +156,7 @@ class EmbeddingMetrics(IMetricVisualisable):
         self.cmc_top_k = cmc_top_k
         self.precision_top_k = precision_top_k
         self.map_top_k = map_top_k
+        self.ndcg_top_k = ndcg_top_k
         self.fmr_vals = fmr_vals
         self.pcf_variance = pcf_variance
         self.postprocessor = postprocessor
@@ -231,6 +237,7 @@ class EmbeddingMetrics(IMetricVisualisable):
             "cmc_top_k": self.cmc_top_k,
             "precision_top_k": self.precision_top_k,
             "map_top_k": self.map_top_k,
+            "ndcg_top_k": self.ndcg_top_k,
             "rr": self.retrieval_results,
             "reduce": False,
             "verbose": self.verbose,
