@@ -17,11 +17,13 @@ TCategories = Union[LongTensor, np.ndarray]
 def calc_retrieval_metrics(
     retrieved_ids: Sequence[LongTensor],
     gt_ids: Sequence[LongTensor],
+    distances: Optional[Sequence[FloatTensor]] = None,
     query_categories: Optional[TCategories] = None,
     cmc_top_k: Tuple[int, ...] = (5,),
     precision_top_k: Tuple[int, ...] = (5,),
     map_top_k: Tuple[int, ...] = (5,),
     ndcg_top_k: Tuple[int, ...] = (5,),
+    calc_global_pr_auc_metric: bool = False,
     reduce: bool = True,
     verbose: bool = True,
 ) -> TMetricsDict:
@@ -52,6 +54,13 @@ def calc_retrieval_metrics(
     n_gts = [len(ids) for ids in gt_ids]
 
     metrics: TMetricsDict = defaultdict(dict)
+
+    
+    if calc_global_pr_auc_metric:
+        if distances is None:
+            raise ValueError("distances must be provided to calculate global PR AUC.")
+        pr_auc = calc_global_pr_auc(gt_tops, distances)
+        metrics["global_pr_auc"] = pr_auc
 
     if cmc_top_k:
         cmc = calc_cmc(gt_tops, n_gts, cmc_top_k, verbose=verbose)
@@ -582,6 +591,36 @@ def _check_if_in_range(vals: Sequence[float], min_: float, max_: float, name: st
         raise ValueError(f"{name} is expected to contain numbers in range [{min_}, {max_}], but got {vals}")
 
 
+
+def calc_global_pr_auc(gt_tops: Sequence[BoolTensor], distances: Sequence[FloatTensor]) -> float:
+    """
+    Function to compute Global Precision-Recall AUC (PR-AUC).
+    
+    Args:
+        gt_tops: Indicators that show if retrievied items are correct or not:
+            ``gt_tops[i][j]`` is ``True`` if ``j``-th gallery item is related to the ``i``-th query item.
+        distances: Distances corresponding to the retrieved items.
+        
+    Returns:
+        Area under the global precision-recall curve.
+    """
+    if len(gt_tops) == 0:
+        return 0.0
+        
+    from sklearn.metrics import precision_recall_curve, auc
+    
+    y_true = torch.cat([gt.bool() for gt in gt_tops]).cpu().numpy()
+    y_scores = torch.cat([-d.float() for d in distances]).cpu().numpy()
+    
+    if len(y_true) == 0:
+        return 0.0
+        
+    if not np.any(y_true):
+        return 0.0
+        
+    precision, recall, _ = precision_recall_curve(y_true, y_scores)
+    return float(auc(recall, precision))
+
 __all__ = [
     "TMetricsDict",
     "calc_retrieval_metrics",
@@ -590,4 +629,5 @@ __all__ = [
     "take_unreduced_metrics_by_mask",
     "calc_fnmr_at_fmr",
     "calc_ndcg",
+    "calc_global_pr_auc",
 ]

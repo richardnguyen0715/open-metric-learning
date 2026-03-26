@@ -38,6 +38,7 @@ def calc_retrieval_metrics_rr(
     precision_top_k: Tuple[int, ...] = (5,),
     map_top_k: Tuple[int, ...] = (5,),
     ndcg_top_k: Tuple[int, ...] = (5,),
+    calc_global_pr_auc_metric: bool = False,
     reduce: bool = True,
     verbose: bool = True,
 ) -> TMetricsDict:
@@ -119,6 +120,7 @@ class EmbeddingMetrics(IMetricVisualisable):
         precision_top_k: Tuple[int, ...] = (5,),
         map_top_k: Tuple[int, ...] = (5,),
         ndcg_top_k: Tuple[int, ...] = (5,),
+        calc_global_pr_auc_metric: bool = False,
         fmr_vals: Tuple[float, ...] = tuple(),
         pcf_variance: Tuple[float, ...] = (0.5,),
         postprocessor: Optional[IRetrievalPostprocessor] = None,
@@ -157,6 +159,7 @@ class EmbeddingMetrics(IMetricVisualisable):
         self.precision_top_k = precision_top_k
         self.map_top_k = map_top_k
         self.ndcg_top_k = ndcg_top_k
+        self.calc_global_pr_auc_metric = calc_global_pr_auc_metric
         self.fmr_vals = fmr_vals
         self.pcf_variance = pcf_variance
         self.postprocessor = postprocessor
@@ -238,6 +241,7 @@ class EmbeddingMetrics(IMetricVisualisable):
             "precision_top_k": self.precision_top_k,
             "map_top_k": self.map_top_k,
             "ndcg_top_k": self.ndcg_top_k,
+            "calc_global_pr_auc_metric": self.calc_global_pr_auc_metric,
             "rr": self.retrieval_results,
             "reduce": False,
             "verbose": self.verbose,
