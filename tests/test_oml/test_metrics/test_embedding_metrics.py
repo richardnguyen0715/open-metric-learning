@@ -114,6 +114,7 @@ def run_retrieval_metrics(case) -> None:  # type: ignore
         cmc_top_k=top_k,
         precision_top_k=tuple(),
         map_top_k=tuple(),
+        ndcg_top_k=tuple(),
         fmr_vals=tuple(),
         pcf_variance=tuple(),
         postprocessor=get_trivial_postprocessor(top_n=num_samples),
@@ -149,6 +150,7 @@ def run_across_epochs(case) -> None:  # type: ignore
         cmc_top_k=top_k,
         precision_top_k=tuple(),
         map_top_k=tuple(),
+        ndcg_top_k=tuple(),
         fmr_vals=tuple(),
         pcf_variance=tuple(),
         postprocessor=get_trivial_postprocessor(top_n=num_samples),
@@ -202,6 +204,7 @@ def test_worst_k(case_for_finding_worst_queries) -> None:  # type: ignore
         cmc_top_k=(1,),
         precision_top_k=(),
         map_top_k=(),
+        ndcg_top_k=tuple(),
         fmr_vals=tuple(),
         postprocessor=get_trivial_postprocessor(top_n=len(dataset)),
     )
@@ -223,6 +226,9 @@ def test_all_requested_metrics_are_calculated(perfect_case) -> None:  # type: ig
         cmc_top_k=(1,),
         precision_top_k=(2,),
         map_top_k=(4, 500),
+        ndcg_top_k=tuple(),
+        calc_global_pr_auc_metric=False,
+
         pcf_variance=(0.2, 0.1),
         fmr_vals=(0.3, 0.5),
         postprocessor=get_trivial_postprocessor(top_n=len(dataset)),

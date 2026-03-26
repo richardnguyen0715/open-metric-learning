@@ -84,16 +84,19 @@ def test_val_qg_only_bool(mock_dfs: TDFrames) -> None:
     _, df_val, _ = mock_dfs
 
     df = df_val.copy()
+    df[IS_QUERY_COLUMN] = df[IS_QUERY_COLUMN].astype(object)
     df.loc[0, IS_QUERY_COLUMN] = "asd"
     with pytest.raises(AssertionError):
         check_retrieval_dataframe_format(df, dataset_root=MOCK_DATASET_PATH)
 
     df = df_val.copy()
+    df[IS_GALLERY_COLUMN] = df[IS_GALLERY_COLUMN].astype(object)
     df.loc[0, IS_GALLERY_COLUMN] = 123
     with pytest.raises(AssertionError):
         check_retrieval_dataframe_format(df, dataset_root=MOCK_DATASET_PATH)
 
     df = df_val.copy()
+    df[IS_GALLERY_COLUMN] = df[IS_GALLERY_COLUMN].astype(object)
     df.loc[0, IS_GALLERY_COLUMN] = None
     with pytest.raises(AssertionError):
         check_retrieval_dataframe_format(df, dataset_root=MOCK_DATASET_PATH)

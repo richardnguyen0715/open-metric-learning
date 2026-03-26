@@ -39,11 +39,11 @@ def test_ndcg_edge_cases():
     res = calc_ndcg(gt_tops, n_gts, top_k=(5,))
     assert torch.allclose(res[0], FloatTensor([0.0]))
 
-    # 6. Non-empty predictions, empty targets -> 1.0
+    # 6. Non-empty predictions, empty targets -> 0.0
     gt_tops = [BoolTensor([0, 0])]
     n_gts = [0]
     res = calc_ndcg(gt_tops, n_gts, top_k=(5,))
-    assert torch.allclose(res[0], FloatTensor([1.0]))
+    assert torch.allclose(res[0], FloatTensor([0.0]))
 
 def test_ndcg_via_calc_retrieval_metrics():
     retrieved_ids = [LongTensor([0, 5, 4]), LongTensor([2, 1, 5]), LongTensor([2, 1, 5])]

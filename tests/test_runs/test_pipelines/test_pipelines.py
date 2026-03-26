@@ -39,7 +39,8 @@ def rm_logs(cfg_name: Path) -> None:
 
 
 def run(file: str, accelerator: str, devices: int, need_rm_logs: bool = True) -> None:
-    cmd = f"python {str(SCRIPTS_PATH / file)} ++accelerator='{accelerator}' ++devices='{devices}'"
+    import sys
+    cmd = f"{sys.executable} {str(SCRIPTS_PATH / file)} ++accelerator='{accelerator}' ++devices='{devices}'"
     subprocess.run(cmd, check=True, shell=True)
 
     if need_rm_logs:

@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -51,7 +52,7 @@ def test_code_blocks_in_readme(fname: str, start_indicator: str, end_indicator: 
         f.write(code)
 
     try:
-        subprocess.run(f"python {tmp_fname}", check=True, shell=True)
+        subprocess.run(f"{sys.executable} {tmp_fname}", check=True, shell=True)
     finally:
         Path(tmp_fname).unlink()
 
@@ -77,6 +78,7 @@ def test_minimal_pipeline_example() -> None:
         r.write(validate_text)
 
     try:
+        command_text = command_text.replace("python", sys.executable)
         subprocess.run(command_text, check=True, shell=True)
     except Exception as e:
         raise e
