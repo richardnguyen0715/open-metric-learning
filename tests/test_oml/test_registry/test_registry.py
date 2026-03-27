@@ -65,7 +65,16 @@ def get_opt() -> Optimizer:
     ],
 )
 def test_registry(folder_name, registry, factory_fun, runtime_args) -> None:
+    import os
     dotenv.load_dotenv(DOTENV_PATH)  # we need to load tokens for cloud loggers (Neptune, W & B)
+    if "WANDB_API_KEY" not in os.environ:
+        os.environ["WANDB_API_KEY"] = "mock_wandb_key"
+    if "NEPTUNE_API_TOKEN" not in os.environ:
+        os.environ["NEPTUNE_API_TOKEN"] = "mock_neptune_token"
+    if "CLEARML_API_ACCESS_KEY" not in os.environ:
+        os.environ["CLEARML_API_ACCESS_KEY"] = "mock_clearml_access_key"
+    if "CLEARML_API_SECRET_KEY" not in os.environ:
+        os.environ["CLEARML_API_SECRET_KEY"] = "mock_clearml_secret_key"
 
     for obj_name in registry.keys():
         cfg = dictconfig_to_dict(OmegaConf.load(CONFIGS_PATH / folder_name / f"{obj_name}.yaml"))

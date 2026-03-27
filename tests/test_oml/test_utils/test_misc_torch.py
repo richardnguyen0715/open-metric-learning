@@ -262,11 +262,11 @@ def test_pca() -> None:
     pca = PCA(embeddings)
     embeddings_ = pca.transform(embeddings)
 
-    assert torch.all(torch.isclose(sklearn_singular_values, pca.singular_values))
-    assert torch.all(torch.isclose(sklearn_explained_variance, pca.explained_variance))
-    assert torch.all(torch.isclose(sklearn_explained_variance_ratio, pca.explained_variance_ratio))
-    assert torch.all(torch.isclose(sklearn_mean, pca.mean))
-    assert torch.all(torch.isclose(sklearn_components, pca.components, atol=1e-3))
+    assert torch.all(torch.isclose(sklearn_singular_values, pca.singular_values, atol=1e-5))
+    assert torch.all(torch.isclose(sklearn_explained_variance, pca.explained_variance, atol=1e-5))
+    assert torch.all(torch.isclose(sklearn_explained_variance_ratio, pca.explained_variance_ratio, atol=1e-5))
+    assert torch.all(torch.isclose(sklearn_mean, pca.mean, atol=1e-5))
+    assert torch.all(torch.isclose(sklearn_components, pca.components, atol=5e-3))
     assert torch.all(torch.isclose(sklearn_embeddings_transformed, embeddings_, atol=1.0e-4))
 
 

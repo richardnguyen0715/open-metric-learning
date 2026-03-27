@@ -108,12 +108,11 @@ def visualize_audio_with_player(
     Returns:
         An HTML string that contains the spectral representation image and an audio player.
     """
-    import torchaudio
-
     image_base64 = _visualize_audio(spec_repr, color, draw_bbox, return_b64=True)  # type: ignore
 
+    import soundfile as sf
     buf = BytesIO()
-    torchaudio.save(buf, audio, sample_rate=sample_rate, format="wav")
+    sf.write(buf, audio.numpy().T if audio.ndim > 1 else audio.numpy(), samplerate=sample_rate, format="WAV")
     buf.seek(0)
     audio_base64 = base64.b64encode(buf.getvalue()).decode("ascii")
 

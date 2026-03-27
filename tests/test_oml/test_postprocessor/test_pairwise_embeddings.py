@@ -188,14 +188,13 @@ def test_processing_not_changing_non_sensitive_metrics(top_n: int) -> None:
         "cmc_top_k": (top_n,),
         "precision_top_k": (top_n,),
         "map_top_k": tuple(),
+        "ndcg_top_k": tuple(),
     }
-
-    metrics_before = calc_retrieval_metrics_rr(rr, **args)  # type: ignore
-
+    
     model = RandomPairwise()
     processor = PairwiseReranker(pairwise_model=model, top_n=top_n, batch_size=4, num_workers=0)
     rr_upd = processor.process(rr, dataset=dataset)
-
+    metrics_before = calc_retrieval_metrics_rr(rr, **args)  # type: ignore
     metrics_after = calc_retrieval_metrics_rr(rr_upd, **args)  # type: ignore
 
     assert metrics_before == metrics_after
